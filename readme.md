@@ -1,5 +1,5 @@
 - Init server unicorn en ambiente desarrollo
-> uvicorn main:app --reload
+> uvicorn controllers.main:app --reload
 
 
 - Path documentation paths
