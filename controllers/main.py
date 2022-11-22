@@ -1,6 +1,6 @@
 from fastapi import FastAPI, Query
 from pydantic import BaseModel, Required
-from typing import Union
+from typing import Union, List
 from enum import Enum
 
 app = FastAPI()
@@ -209,3 +209,77 @@ async def read_items(q: str = Query(default=Required, min_length=3)):
     if q:
         results.update({"q": q})
     return results
+
+
+@app.get("/items9/")
+async def read_items_list(q: Union[List[str], None] = Query(default=None)):
+    query_items = {"q": q}
+    return query_items
+
+
+@app.get("/items10/")
+async def read_items_list(q: Union[List[str], None] = Query(default=["foo", "bar"])):
+    query_items = {"q": q}
+    return query_items
+
+
+@app.get("/items11/")
+async def read_items(
+    q: Union[str, None] = Query(
+        default=None,
+        title="Query string",
+        description="Query string for the items to search in the database that have a good match",
+        min_length=3
+    )
+):
+    results = {"items": [
+        {"item_id": "Foo"},
+        {"item_id": "Bar"}
+    ]}
+    if q:
+        results.update({"q": q})
+    return results
+
+
+@app.get("/items12/")
+async def read_items(q: Union[str, None] = Query(default=None, alias="item-query")):
+    results = {"items": [{"item_id": "Foo"}, {"item_id": "Bar"}]}
+    if q:
+        results.update({"q": q})
+    return results
+
+
+@app.get("/items13/")
+async def read_items(
+    q: Union[str, None] = Query(
+        default=None,
+        alias="item-query",
+        title="Query string",
+        description="Query string for the items to search in the database that have a good match",
+        min_length=3,
+        max_length=50,
+        regex="^fixedquery$",
+        deprecated=True,
+    )
+):
+    results = {"items": [
+        {"item_id": "Foo"},
+        {"item_id": "Bar"}
+    ]}
+    if q:
+        results.update({"q": q})
+    return results
+
+
+@app.get("/items14/")
+async def read_items(
+    hidden_query: Union[str, None] = Query(default=None, include_in_schema=False)
+):
+    if hidden_query:
+        return {
+            "hidden_query": hidden_query
+        }
+    else:
+        return {
+            "hidden_query": "Not found"
+        }
