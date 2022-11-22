@@ -1,5 +1,5 @@
-from fastapi import FastAPI
-from pydantic import BaseModel
+from fastapi import FastAPI, Query
+from pydantic import BaseModel, Required
 from typing import Union
 from enum import Enum
 
@@ -136,3 +136,76 @@ async def read_user_item(item_id: str, needy: str, skip: int = 0, limit: Union[i
         "limit": limit
     }
     return item
+
+
+class Item2(BaseModel):
+    name: str
+    description: Union[str, None] = None
+    price: float
+    tax: Union[float, None] = None
+
+
+@app.post("/items/")
+async def creat_item(item: Item2):
+    item_dict = item.dict()
+    if item.tax:
+        price_with_tax = item.price + item.tax
+        item_dict.update({"price_with_tax": price_with_tax})
+    return item_dict
+
+
+@app.put("/items4/{item_id}")
+async def create_item(item_id: int, item: Item2, q: Union[str, None] = None):
+    result = {"item_id": item_id, **item.dict()}
+    if q:
+        result.update({"q": q})
+    return result
+
+
+@app.get("/items5/")
+async def read_items(q: Union[str, None] = Query(
+    default=None, min_length=3, max_length=50, regex="^fixedquery$"
+)):
+    results = {
+        "items": [
+            {"item_id": "Foo"},
+            {"item_id": "Bar"}
+        ]
+    }
+    if q:
+        results.update({"q": q})
+    return results
+
+
+@app.get("/items6/")
+async def read_items(q: str = Query(min_length=3)):
+    results = {"items": [
+        {"item_id": "Foo"},
+        {"item_id": "Bar"}
+    ]}
+    if q:
+        results.update({"q": q})
+    return results
+
+
+# ... => el parámetro es requerido
+@app.get("/items7/")
+async def read_items(q: str = Query(default=..., min_length=3)):
+    results = {"items": [
+        {"item_id": "Foo"},
+        {"item_id": "Bar"}
+    ]}
+    if q:
+        results.update({"q": q})
+    return results
+
+
+@app.get("/items8/")
+async def read_items(q: str = Query(default=Required, min_length=3)):
+    results = {"items": [
+        {"item_id": "Foo"},
+        {"item_id": "Bar"}
+    ]}
+    if q:
+        results.update({"q": q})
+    return results

@@ -1,4 +1,4 @@
-- Init server unicorn en ambiente desarrollo
+- Init server unicorn in environment dev
 > uvicorn controllers.main:app --reload
 
 
