@@ -1,4 +1,4 @@
-from fastapi import FastAPI, Query
+from fastapi import FastAPI, Query, Path
 from pydantic import BaseModel, Required
 from typing import Union, List
 from enum import Enum
@@ -283,3 +283,59 @@ async def read_items(
         return {
             "hidden_query": "Not found"
         }
+
+
+@app.get("/items15/{item_id}")
+async def read_items(
+        item_id: int = Path(title="The ID of the item to get"),
+        q: Union[str, None] = Query(default=None, alias="item-query")
+):
+    results = {"item_id": item_id}
+    if q:
+        results.update({"q": q})
+    return results
+
+
+@app.get("/items16/{item_id}")
+async def read_items(*, item_id: int = Path(title="The ID of the item to get"), q: str):
+    results = {"item_id": item_id}
+    if q:
+        results.update({"q": q})
+    return results
+
+
+@app.get("/items17/{item_id}")
+async def read_items(
+    *, item_id: int = Path(title="The ID of the item to get", ge=1), q: str
+):
+    results = {"item_id": item_id}
+    if q:
+        results.update({"q": q})
+    return results
+
+
+@app.get("/items18/{item_id}")
+async def read_items(
+    *,
+    item_id: int = Path(title="The ID of the item to get", gt=0, le=1000),
+    q: str,
+):
+    results = {"item_id": item_id}
+    if q:
+        results.update({"q": q})
+    return results
+
+
+@app.get("/items19/{item_id}")
+async def read_items(
+    *,
+    item_id: int = Path(title="The ID of the item to get", ge=0, le=1000),
+    q: str,
+    size: float = Query(gt=0, lt=10.5)
+):
+    results = {
+        "item_id": item_id,
+        "q": q,
+        "size": size
+    }
+    return results
