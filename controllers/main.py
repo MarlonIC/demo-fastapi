@@ -1,4 +1,4 @@
-from fastapi import FastAPI, Query, Path
+from fastapi import FastAPI, Body, Query, Path
 from pydantic import BaseModel, Required
 from typing import Union, List
 from enum import Enum
@@ -338,4 +338,69 @@ async def read_items(
         "q": q,
         "size": size
     }
+    return results
+
+
+class Item3(BaseModel):
+    name: str
+    description: Union[str, None] = None
+    price: float
+    tax: Union[float, None] = None
+
+
+@app.put("/items20/{item_id}")
+async def update_item(
+    *,
+    item_id: int = Path(title="The ID of the item to get", ge=0, le=1000),
+    q: Union[str, None] = None,
+    item: Union[Item3, None] = None
+):
+    results = {"item_id": item_id}
+    if q:
+        results.update({"q": q})
+    if item:
+        results.update({"item": item})
+    return results
+
+
+class User(BaseModel):
+    username: str
+    full_name: Union[str, None] = None
+
+
+@app.put("/items21/{item_id}")
+async def update_item(item_id: int, item: Item3, user: User):
+    results = {"item_id": item_id, "item": item, "user": user}
+    return results
+
+
+@app.put("/items22/{item_id}")
+async def update_item(item_id: int, item: Item3, user: User, importance: int = Body()):
+    results = {
+        "item_id": item_id,
+        "item": item,
+        "user": user,
+        "importance": importance
+    }
+    return results
+
+
+@app.put("/items23/{item_id}")
+async def update_item(
+    *,
+    item_id: int,
+    item: Item3,
+    user: User,
+    importance: int = Body(gt=0),
+    q: Union[str, None] = None
+):
+    results = {"item_id": item_id, "item": item, "user": user, "importance": importance}
+    if q:
+        results.update({"q": q})
+    return results
+
+
+@app.put("/items24/{item_id}")
+async def update_item(item_id: int, item: Item3 = Body(embed=True)):
+    results = {"item_id": item_id, "item": item}
     return results
