@@ -1,6 +1,6 @@
 from fastapi import FastAPI, Body, Query, Path
-from pydantic import BaseModel, Required, Field
-from typing import Union, List
+from pydantic import BaseModel, Required, Field, HttpUrl
+from typing import Union, List, Set, Dict
 from enum import Enum
 
 app = FastAPI()
@@ -416,6 +416,91 @@ class Item4(BaseModel):
 
 
 @app.put("/items25/{item_id}")
-async def update_item(item_id: int, item: Item3 = Body(embed=True)):
+async def update_item(item_id: int, item: Item4 = Body(embed=True)):
     results = {"item_id": item_id, "item": item}
     return results
+
+
+class Item5(BaseModel):
+    name: str
+    description: Union[str, None] = None
+    price: float
+    tax: Union[float, None] = None
+    tags: List[str] = []
+
+
+@app.put("/items26/{item_id}")
+async def update_item(item_id: int, item: Item5):
+    results = {"item_id": item_id, "item": item}
+    return results
+
+
+class Item6(BaseModel):
+    name: str
+    description: Union[str, None] = None
+    price: float
+    tax: Union[float, None] = None
+    tags: Set[str] = set()
+
+
+@app.put("/items27/{item_id}")
+async def update_item(item_id: int, item: Item6):
+    results = {"item_id": item_id, "item": item}
+    return results
+
+
+class Image(BaseModel):
+    url: HttpUrl
+    name: str
+
+
+class Item7(BaseModel):
+    name: str
+    description: Union[str, None] = None
+    price: float
+    tax: Union[float, None] = None
+    tags: Set[str] = set()
+    image: Union[Image, None] = None
+
+
+@app.put("/items28/{item_id}")
+async def update_item(item_id: int, item: Item7):
+    results = {"item_id": item_id, "item": item}
+    return results
+
+
+class Item8(BaseModel):
+    name: str
+    description: Union[str, None] = None
+    price: float
+    tax: Union[float, None] = None
+    tags: Set[str] = set()
+    images: Union[List[Image], None] = None
+
+
+@app.put("/items29/{item_id}")
+async def update_item(item_id: int, item: Item8):
+    results = {"item_id": item_id, "item": item}
+    return results
+
+
+class Offer(BaseModel):
+    name: str
+    description: Union[str, None] = None
+    price: float
+    items: List[Item8]
+
+
+@app.post("/offers/")
+async def create_offer(offer: Offer):
+    return offer
+
+
+@app.post("/images/multiple/")
+async def create_multiple_images(images: List[Image]):
+    return images
+
+
+@app.post("/index-weights/")
+async def create_index_weights(weights: Dict[int, float]):
+    return weights
