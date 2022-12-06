@@ -657,3 +657,100 @@ async def read_items(x_token: Union[List[str], None] = Header(default=None)):
     return {
         "X-Token values": x_token
     }
+
+
+# Response Model
+class Item12(BaseModel):
+    name: str
+    description: Union[str, None] = None
+    price: float
+    tax: Union[float, None] = None
+    tags: List[str] = []
+
+
+@app.post("/items39/", response_model=Item12)
+async def create_item(item: Item12):
+    return item
+
+
+class UserIn(BaseModel):
+    username: str
+    password: str
+    email: EmailStr
+    full_name: Union[str, None] = None
+
+
+# Don't do this in production! (devolver el password en el response)
+@app.post("/user/", response_model=UserIn)
+async def create_user(user: UserIn):
+    return user
+
+
+class UserOut(BaseModel):
+    username: str
+    email: EmailStr
+    full_name: Union[str, None] = None
+
+
+@app.post("/user1/", response_model=UserOut)
+async def create_user(user: UserIn):
+    return user
+
+
+class Item13(BaseModel):
+    name: str
+    description: Union[str, None] = None
+    price: float
+    tax: float = 10.5
+    tags: List[str] = []
+
+
+items = {
+    "foo": {"name": "Foo", "price": 50.2},
+    "bar": {"name": "Bar", "description": "The bartenders", "price": 62, "tax": 20.2},
+    "baz": {"name": "Baz", "description": None, "price": 50.2, "tax": 10.5, "tags": []},
+}
+
+
+@app.get("/items40/{item_id}", response_model=Item13, response_model_exclude_unset=True)
+async def read_item(item_id: str):
+    return items[item_id]
+
+
+@app.get("/items41/{item_id}", response_model=Item13, response_model_exclude_defaults=True)
+async def read_item(item_id: str):
+    return items[item_id]
+
+
+@app.get("/items42/{item_id}", response_model=Item13, response_model_exclude_none=True)
+async def read_item(item_id: str):
+    return items[item_id]
+
+
+class Item14(BaseModel):
+    name: str
+    description: Union[str, None] = None
+    price: float
+    tax: float = 10.5
+
+
+items2 = {
+    "foo": {"name": "Foo", "price": 50.2},
+    "bar": {"name": "Bar", "description": "The Bar fighters", "price": 62, "tax": 20.2},
+    "baz": {
+        "name": "Baz",
+        "description": "There goes my baz",
+        "price": 50.2,
+        "tax": 10.5,
+    },
+}
+
+
+@app.get("/items43/{item_id}/name", response_model=Item14, response_model_include={"name", "description"})
+async def read_item_name(item_id: str):
+    return items2[item_id]
+
+
+@app.get("/items44/{item_id}/public", response_model=Item14, response_model_exclude={"tax"})
+async def read_item_public_data(item_id: str):
+    return items2[item_id]
