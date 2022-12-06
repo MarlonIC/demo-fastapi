@@ -635,3 +635,25 @@ async def read_items(ads_id: Union[str, None] = Cookie(default=None)):
     return {
         "ads_id": ads_id
     }
+
+
+# Header Parameters
+@app.get("/items36/")
+async def read_items(user_agent: Union[str, None] = Header(default=None)):
+    return {
+        "User-Agent": user_agent
+    }
+
+
+@app.get("/items37/")
+async def read_items(strange_header: Union[str, None] = Header(default=None, convert_underscores=False)):
+    return {
+        "strange_header": strange_header
+    }
+
+
+@app.get("/items38/")
+async def read_items(x_token: Union[List[str], None] = Header(default=None)):
+    return {
+        "X-Token values": x_token
+    }
