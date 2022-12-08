@@ -964,3 +964,15 @@ async def main():
     </body>
     """
     return HTMLResponse(content=content)
+
+
+# Request Forms and Files
+@app.post("/files5/")
+async def create_file(
+    file: bytes = File(), fileb: UploadFile = File(), token: str = Form()
+):
+    return {
+        "file_size": len(file),
+        "token": token,
+        "fileb_content_type": fileb.content_type,
+    }
