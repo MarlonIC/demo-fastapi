@@ -1,5 +1,5 @@
 from datetime import datetime, time, timedelta
-from fastapi import FastAPI, Body, Query, Path, Cookie, Header
+from fastapi import FastAPI, Body, Query, Path, Cookie, Header, status
 from pydantic import BaseModel, Required, Field, HttpUrl, EmailStr
 from typing import Union, List, Set, Dict
 from enum import Enum
@@ -873,3 +873,14 @@ async def read_items():
 @app.get("/keyword-weights/", response_model=Dict[str, float])
 async def read_keyword_weights():
     return {"foo": 2.3, "bar": 3.4}
+
+
+# Response Status Code
+@app.post("/items47/", status_code=201)
+async def create_item(name: str):
+    return {"name": name}
+
+
+@app.post("/items48/", status_code=status.HTTP_201_CREATED)
+async def create_item(name: str):
+    return {"name": name}
