@@ -1,9 +1,14 @@
 from datetime import datetime, time, timedelta
-from fastapi import FastAPI, Body, Query, Path, Cookie, Header, status, Form
-from pydantic import BaseModel, Required, Field, HttpUrl, EmailStr
+
 from typing import Union, List, Set, Dict
 from enum import Enum
 from uuid import UUID
+
+from fastapi import FastAPI, Body, Query, Path, Cookie, Header, status
+from fastapi import Form, File, UploadFile
+from fastapi.responses import HTMLResponse
+
+from pydantic import BaseModel, Required, Field, HttpUrl, EmailStr
 
 app = FastAPI()
 
@@ -890,3 +895,72 @@ async def create_item(name: str):
 @app.post("/login/")
 async def login(username: str = Form(), password: str = Form()):
     return {"username": username}
+
+
+# Request Files
+@app.post("/files/")
+async def create_file(file: bytes = File()):
+    return {"file_size": len(file)}
+
+
+@app.post("/uploadfile/")
+async def create_upload_file(file: UploadFile):
+    return {
+        "filename": file.filename,
+        "content_type": file.content_type
+    }
+
+
+@app.post("/files2/")
+async def create_file(file: Union[bytes, None] = File(default=None)):
+    if not file:
+        return {"message": "No file sent"}
+    else:
+        return {"file_size": len(file)}
+
+
+@app.post("/uploadfile2/")
+async def create_upload_file(file: Union[UploadFile, None] = None):
+    if not file:
+        return {"message": "No upload file sent"}
+    else:
+        return {"filename": file.filename}
+
+
+@app.post("/files3/")
+async def create_file(file: bytes = File(description="A file read as bytes")):
+    return {"file_size": len(file)}
+
+
+@app.post("/uploadfile3/")
+async def create_upload_file(
+    file: UploadFile = File(description="A file read as UploadFile"),
+):
+    return {"filename": file.filename}
+
+
+@app.post("/files4/")
+async def create_files(files: List[bytes] = File()):
+    return {"file_sizes": [len(file) for file in files]}
+
+
+@app.post("/uploadfiles4/")
+async def create_upload_files(files: List[UploadFile] = File(description="Multiple files as UploadFile")):
+    return {"filenames": [file.filename for file in files]}
+
+
+@app.get("/form")
+async def main():
+    content = """
+    <body>
+        <form action="/files4/" enctype="multipart/form-data" method="post">
+            <input name="files" type="file" multiple>
+            <input type="submit">
+        </form>
+        <form action="/uploadfiles4/" enctype="multipart/form-data" method="post">
+            <input name="files" type="file" multiple>
+            <input type="submit">
+        </form>
+    </body>
+    """
+    return HTMLResponse(content=content)
