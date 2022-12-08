@@ -1,5 +1,5 @@
 from datetime import datetime, time, timedelta
-from fastapi import FastAPI, Body, Query, Path, Cookie, Header, status
+from fastapi import FastAPI, Body, Query, Path, Cookie, Header, status, Form
 from pydantic import BaseModel, Required, Field, HttpUrl, EmailStr
 from typing import Union, List, Set, Dict
 from enum import Enum
@@ -884,3 +884,9 @@ async def create_item(name: str):
 @app.post("/items48/", status_code=status.HTTP_201_CREATED)
 async def create_item(name: str):
     return {"name": name}
+
+
+# Form Data
+@app.post("/login/")
+async def login(username: str = Form(), password: str = Form()):
+    return {"username": username}
