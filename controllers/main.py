@@ -1072,3 +1072,20 @@ async def create_item(item: Item16):
 @app.get("/elements1/", tags=["items"], deprecated=True)
 async def read_elements():
     return [{"item_id": "Foo"}]
+
+
+# JSON Compatible Encoder
+fake_db = {}
+
+
+class Item17(BaseModel):
+    title: str
+    timestamp: datetime
+    description: Union[str, None] = None
+
+
+@app.put("/items60/{id}")
+def update_item(id: str, item: Item17):
+    json_compatible_item_data = jsonable_encoder(item)
+    fake_db[id] = json_compatible_item_data
+    print(fake_db)
