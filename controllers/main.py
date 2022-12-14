@@ -980,3 +980,95 @@ async def create_file(
         "token": token,
         "fileb_content_type": fileb.content_type,
     }
+
+
+# Path Operation Configuration
+class Item16(BaseModel):
+    name: str
+    description: Union[str, None] = None
+    price: float
+    tax: Union[float, None] = None
+    tags: Set[str] = set()
+
+
+@app.post("/items53/", response_model=Item16, status_code=status.HTTP_201_CREATED)
+async def create_item(item: Item16):
+    return item
+
+
+@app.post("/items54/", response_model=Item16, tags=["items doc openapi"])
+async def create_item(item: Item16):
+    return item
+
+
+@app.get("/items55/", tags=["items doc openapi"])
+async def read_items():
+    return [{"name": "Foo", "price": 42}]
+
+
+@app.get("/users1/", tags=["users doc openapi"])
+async def read_users():
+    return [{"username": "johndoe"}]
+
+
+class Tags(Enum):
+    items = "items"
+    users = "users"
+
+
+@app.get("/items56/", tags=[Tags.items])
+async def get_items():
+    return ["Portal gun", "Plumbus"]
+
+
+@app.get("/users2/", tags=[Tags.users])
+async def read_users():
+    return ["Rick", "Morty"]
+
+
+@app.post(
+    "/items57/",
+    response_model=Item16,
+    summary="Create an item",
+    description="Create an item with all the information, name, description, price, tax and a set of unique tags",
+)
+async def create_item(item: Item16):
+    return item
+
+
+@app.post("/items58/", response_model=Item16, summary="Create an item")
+async def create_item(item: Item16):
+    """
+    Create an item with all the information:
+
+    - **name**: each item must have a name
+    - **description**: a long description
+    - **price**: required
+    - **tax**: if the item doesn't have tax, you can omit this
+    - **tags**: a set of unique tag strings for this item
+    """
+    return item
+
+
+@app.post(
+    "/items59/",
+    response_model=Item16,
+    summary="Create an item",
+    response_description="The created item",
+)
+async def create_item(item: Item16):
+    """
+    Create an item with all the information:
+
+    - **name**: each item must have a name
+    - **description**: a long description
+    - **price**: required
+    - **tax**: if the item doesn't have tax, you can omit this
+    - **tags**: a set of unique tag strings for this item
+    """
+    return item
+
+
+@app.get("/elements1/", tags=["items"], deprecated=True)
+async def read_elements():
+    return [{"item_id": "Foo"}]
