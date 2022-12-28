@@ -1,6 +1,6 @@
 from typing import Union
 
-from fastapi import Depends, FastAPI, Cookie
+from fastapi import Depends, FastAPI, Cookie, Header, HTTPException
 
 app = FastAPI()
 
@@ -72,3 +72,21 @@ def query_or_cookie_extractor(
 @app.get("/items3/")
 async def read_query(query_or_default: str = Depends(query_or_cookie_extractor)):
     return {"q_or_cookie": query_or_default}
+
+
+# Dependencies in path operation decorators
+async def verify_token(x_token: str = Header()):
+    if x_token != "fake-super-secret-token":
+        raise HTTPException(status_code=400, detail="X-Token header invalid")
+
+
+async def verify_key(x_key: str = Header()):
+    if x_key != "fake-super-secret-key":
+        raise HTTPException(status_code=400, detail="X-Key header invalid")
+    return x_key
+
+
+@app.get("/items4/", dependencies=[Depends(verify_token), Depends(verify_key)])
+async def read_items():
+    return [{"item": "Foo"}, {"item": "Bar"}]
+
